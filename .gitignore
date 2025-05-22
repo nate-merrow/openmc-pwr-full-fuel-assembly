@@ -1,0 +1,13 @@
+*.h5
+*.xml
+*.png
+*.out
+*.binary
+*.npy
+*.npz
+__pycache__/
+*.pyc
+.svn
+.idea/
+.vscode/
+openmc_output/
