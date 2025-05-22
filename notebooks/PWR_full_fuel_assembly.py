@@ -218,22 +218,7 @@ openmc.plot_geometry()
                 # Run #
 ##############################################
 
-plot = openmc.Plot()
-plot.origin = (0, 0, 0)
-plot.width = (25, 25)
-plot.pixels = (1000, 1000)
-plot.color_by = 'material'
-plot.basis = 'xy'
-plot.filename = 'fuel_assembly_plot'
-
-# Export plot settings to plot.xml
-plots = openmc.Plots([plot])
-plots.export_to_xml()
-
-# Run the plot command (generates a .png image in your directory)
-openmc.plot_geometry()
-
-
+openmc.run()
 
 
 
