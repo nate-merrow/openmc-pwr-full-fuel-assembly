@@ -188,19 +188,33 @@ settings.export_to_xml()
                 # Tallies #
 ##############################################
 
+mesh = openmc.RegularMesh()
+mesh.dimension = [50, 50, 1] 
+mesh.lower_left = [-12, -12, -1]
+mesh.upper_right = [12, 12, 1]
+
 cell_filter = openmc.CellFilter(fuel_cell)
 
-tally = openmc.Tally(1)
-tally.filters = [cell_filter]
-tally.nuclides = ['U235']
-tally.scores = ['total', 'fission', 'absorption', '(n,gamma)']
+fuel_tally = openmc.Tally(name='fuel_reactions')
+fuel_tally.filters = [cell_filter]
+fuel_tally.nuclides = ['U235']
+fuel_tally.scores = ['total', 'fission', 'absorption', '(n,gamma)']
 
-tallies = openmc.Tallies([tally])
+flux_tally = openmc.Tally(name='flux')
+flux_tally.filters = [openmc.MeshFilter(mesh)]
+flux_tally.scores = ['flux']
+
+rr_tally = openmc.Tally(name='reaction_rates')
+rr_tally.scores = ['fission', 'absorption']
+
+tallies = openmc.Tallies([fuel_tally, flux_tally, rr_tally])
 tallies.export_to_xml()
 
 ##############################################
                 # Plotting #
 ##############################################
+
+########### Geometry Vizualization ##########
 
 plot = openmc.Plot()
 plot.origin = (0,0,0)
@@ -220,9 +234,28 @@ openmc.plot_geometry()
 
 openmc.run()
 
+##############################################
+                # Post-Processing #
+##############################################
 
+import openmc
+import matplotlib.pyplot as plt
+import numpy as np
 
+sp = openmc.StatePoint('statepoint.100.h5')
 
+for tally in sp.tallies.values():
+    print(tally)
+
+flux_tally = sp.get_tally(name='flux')
+
+df = flux_tally.get_pandas_dataframe()
+flux = df['mean'].values.reshape((50, 50))
+
+plt.imshow(flux, origin='lower')
+plt.colorbar(label='Flux')
+plt.title('Flux Distribution')
+plt.show()
 
 
 
